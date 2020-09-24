@@ -2,17 +2,18 @@ package main
 
 import (
 	"fmt"
-	"github.com/yusufsyaifudin/attendant"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/yusufsyaifudin/attendant"
 )
 
 func main() {
 	srvConf := attendant.Config{
 		EnableProfiling: false,
-		ListenAddress:   ":8000",
+		ListenAddress:   8000,
 		WriteTimeout:    3000 * time.Second,
 		ReadTimeout:     3000 * time.Second,
 		ZapLogger:       nil,

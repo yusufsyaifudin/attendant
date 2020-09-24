@@ -235,7 +235,7 @@ func NewServer(conf Config) *server {
 		routes:    make([]*Route, 0),
 
 		enableProfiling: conf.EnableProfiling,
-		listenAddress:   conf.ListenAddress,
+		listenAddress:   fmt.Sprintf(":%d", conf.ListenAddress),
 		writeTimeout:    conf.WriteTimeout,
 		readTimeout:     conf.ReadTimeout,
 

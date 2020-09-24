@@ -22,11 +22,6 @@ func wrapEcho(h Handler) echo.HandlerFunc {
 			ctx.Done()
 		}()
 
-		traceID := "no-trace-id"
-		if sc, ok := span.Context().(jaeger.SpanContext); ok {
-			traceID = sc.String()
-		}
-
 		// create request and run the handler
 		var req = newEchoRequest(eCtx)
 		resp := h(opentracing.ContextWithSpan(ctx, span), req)
@@ -63,7 +58,7 @@ func wrapEcho(h Handler) echo.HandlerFunc {
 		span.LogFields(log.String("response", string(body)))
 
 		// inject to response header
-		_ = opentracing.GlobalTracer().Inject(
+		_ = span.Tracer().Inject(
 			span.Context(),
 			opentracing.HTTPHeaders,
 			opentracing.HTTPHeadersCarrier(resp.Header()),
@@ -76,10 +71,8 @@ func wrapEcho(h Handler) echo.HandlerFunc {
 			}
 		}
 
-		eCtx.Response().Writer.Header().Add("Content-Type", resp.ContentType())
-		eCtx.Response().Writer.Header().Add("X-Uber-ID", traceID)
-
 		// the last is writing the body
+		eCtx.Response().Writer.Header().Add("Content-Type", resp.ContentType())
 		eCtx.Response().Writer.WriteHeader(resp.StatusCode())
 		eCtx.Response().Status = resp.StatusCode() // for echoLogger to log real value, we need pass this
 		eCtx.Response().Size = int64(len(body))

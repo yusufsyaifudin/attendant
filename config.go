@@ -9,7 +9,7 @@ import (
 
 type Config struct {
 	EnableProfiling bool
-	ListenAddress   string
+	ListenAddress   int
 	WriteTimeout    time.Duration
 	ReadTimeout     time.Duration
 
