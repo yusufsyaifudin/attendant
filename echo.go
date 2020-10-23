@@ -83,6 +83,8 @@ func wrapEcho(h Handler) echo.HandlerFunc {
 	}
 }
 
+// stoppingRequest will tell user if server has been stopped but some process still running.
+// This will be called for graceful shutdown.
 func stoppingRequest(stopped bool) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(eCtx echo.Context) error {
