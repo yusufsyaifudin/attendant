@@ -3,24 +3,26 @@ package attendant
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"github.com/stretchr/testify/mock"
 )
 
-type requestMock struct {
+// RequestMock local struct that holds mock instance
+type RequestMock struct {
 	mock.Mock
-
-	startTime time.Time
-	traceID   string
 }
 
-func (r requestMock) ContentType() string {
+// _ ensures that RequestMock implements Request
+var _ Request = (*RequestMock)(nil)
+
+// ContentType mock Request.ContentType
+func (r *RequestMock) ContentType() string {
 	args := r.Called()
 	return args.String(0)
 }
 
-func (r requestMock) Bind(out interface{}) error {
+// Bind mock Request.Bind
+func (r *RequestMock) Bind(out interface{}) error {
 	args := r.Called(out)
 
 	resultByte, _ := json.Marshal(args.Get(0))
@@ -29,21 +31,37 @@ func (r requestMock) Bind(out interface{}) error {
 	return args.Error(1)
 }
 
-func (r requestMock) RawRequest() *http.Request {
+// RawRequest mock Request.RawRequest
+func (r *RequestMock) RawRequest() *http.Request {
 	args := r.Called()
 	return args.Get(0).(*http.Request)
 }
 
-func (r requestMock) GetParam(param string) string {
+// GetParam mock Request.GetParam
+func (r *RequestMock) GetParam(param string) string {
 	args := r.Called(param)
 	return args.String(0)
 }
 
-func (r requestMock) GetQueryParam(param string) string {
+// GetQueryParam mock Request.GetQueryParam
+func (r *RequestMock) GetQueryParam(param string) string {
 	args := r.Called(param)
 	return args.String(0)
 }
 
-func NewRequestMock() *requestMock {
-	return &requestMock{}
+// Set mock Request.Set
+func (r *RequestMock) Set(key string, val interface{}) error {
+	args := r.Called(key, val)
+	return args.Error(0)
+}
+
+// Get mock Request.Get
+func (r *RequestMock) Get(key string) interface{} {
+	args := r.Called(key)
+	return args.Get(0)
+}
+
+// NewRequestMock returns new instance that implements Request interface
+func NewRequestMock() *RequestMock {
+	return &RequestMock{}
 }

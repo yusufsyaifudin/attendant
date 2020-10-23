@@ -143,3 +143,32 @@ func TestRequestMock_GetQueryParam(t *testing.T) {
 		})
 	})
 }
+
+func TestRequestMock_Set(t *testing.T) {
+	convey.Convey("Get Set test", t, func() {
+		convey.Convey("Success", func() {
+			req := NewRequestMock()
+			convey.So(req, convey.ShouldNotBeNil)
+
+			ret := fmt.Errorf("error")
+			req.On("Set", "foo", "bar").Return(ret).Once()
+
+			convey.So(req.Set("foo", "bar"), convey.ShouldResemble, ret)
+		})
+	})
+}
+
+func TestRequestMock_Get(t *testing.T) {
+	convey.Convey("Get Get test", t, func() {
+		convey.Convey("Success", func() {
+			req := NewRequestMock()
+			convey.So(req, convey.ShouldNotBeNil)
+
+			key := "key"
+			data := "data"
+			req.On("Get", key).Return(data).Once()
+
+			convey.So(req.Get(key), convey.ShouldResemble, data)
+		})
+	})
+}

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	// Import this to make pprof works properly
 	_ "net/http/pprof"
 	"os"
 	"strings"
@@ -17,8 +19,8 @@ import (
 	"go.uber.org/zap"
 )
 
-// server is an server for http
-type server struct {
+// Server is an Server for http
+type Server struct {
 	startTime time.Time
 	e         *echo.Echo
 	stopped   bool
@@ -35,7 +37,7 @@ type server struct {
 	openTracing opentracing.Tracer
 }
 
-func (s *server) init() {
+func (s *Server) init() {
 	echo.NotFoundHandler = func(c echo.Context) error {
 		// render your 404 page
 		return c.JSON(http.StatusNotFound, ReplyStructure{
@@ -49,18 +51,14 @@ func (s *server) init() {
 		})
 	}
 
-	// init echo server
+	// init echo Server
 	s.e = echo.New()
 	s.e.HideBanner = true
 	s.e.HidePort = true
 	s.e.Use(jaegertracing.TraceWithConfig(jaegertracing.TraceConfig{
 		Skipper: func(eCtx echo.Context) bool {
 			eCtx.Set(startTimeKey, time.Now())
-			if eCtx.Path() == "/ping" {
-				return true
-			}
-
-			return false
+			return eCtx.Path() == "/ping"
 		},
 		Tracer: s.openTracing,
 	}))
@@ -112,7 +110,7 @@ func (s *server) init() {
 			startTime = v
 		}
 
-		latency := float64(time.Now().Sub(startTime).Nanoseconds()) / float64(time.Millisecond)
+		latency := float64(time.Since(startTime).Nanoseconds()) / float64(time.Millisecond)
 
 		var reqBodyObj interface{}
 		_ = json.Unmarshal(reqBody, &reqBodyObj)
@@ -140,7 +138,7 @@ func (s *server) init() {
 }
 
 // RegisterRoutes will register all routes
-func (s *server) RegisterRoutes(routes []*Route) {
+func (s *Server) RegisterRoutes(routes []*Route) {
 	if s.e == nil {
 		return
 	}
@@ -154,8 +152,8 @@ func (s *server) RegisterRoutes(routes []*Route) {
 	}
 }
 
-// Start will start the server
-func (s *server) Start() error {
+// Start will start the Server
+func (s *Server) Start() error {
 	for _, r := range s.routes {
 
 		// register middleware then define routes
@@ -203,7 +201,7 @@ func (s *server) Start() error {
 		s.zapLogger.Info(route.Path, zap.String("method", route.Method))
 	}
 
-	_, _ = fmt.Fprintf(os.Stdout, "Starting server at %s\n", s.listenAddress)
+	_, _ = fmt.Fprintf(os.Stdout, "Starting Server at %s\n", s.listenAddress)
 	return s.e.StartServer(&http.Server{
 		Addr:         s.listenAddress,
 		ReadTimeout:  s.readTimeout,
@@ -211,13 +209,13 @@ func (s *server) Start() error {
 	})
 }
 
-// Shutdown will inform the server to gracefully shutdown.
-func (s *server) Shutdown() {
+// Shutdown will inform the Server to gracefully shutdown.
+func (s *Server) Shutdown() {
 	s.stopped = true
 }
 
-// NewServer return new server instance
-func NewServer(conf Config) *server {
+// NewServer return new Server instance
+func NewServer(conf Config) *Server {
 	log := conf.ZapLogger
 	if log == nil {
 		log = zap.NewNop()
@@ -228,7 +226,7 @@ func NewServer(conf Config) *server {
 		tracer = new(opentracing.NoopTracer)
 	}
 
-	s := &server{
+	s := &Server{
 		startTime: time.Now(),
 		e:         echo.New(),
 		stopped:   false,

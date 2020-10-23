@@ -3,8 +3,11 @@ package attendant
 import "context"
 
 const (
+	// ContentTypeJSON is header value for content-type: application/json
 	ContentTypeJSON = "application/json"
-	startTimeKey    = "startTime"
+
+	// startTimeKey is key to record start request time
+	startTimeKey = "startTime"
 )
 
 // Handler represents an api handler

@@ -61,5 +61,17 @@ func Test_wrapEcho(t *testing.T) {
 			err := h(c)
 			convey.So(err, convey.ShouldBeNil)
 		})
+
+		convey.Convey("Return success (using header) non HTTP 200", func() {
+			var userHandler = func(ctx context.Context, req Request) Response {
+				return mockResp(http.StatusUnprocessableEntity, http.Header{
+					"Additional-Header": []string{"A", "B"},
+				}, []byte(`{}`), nil)
+			}
+
+			h := wrapEcho(userHandler)
+			err := h(c)
+			convey.So(err, convey.ShouldBeNil)
+		})
 	})
 }
