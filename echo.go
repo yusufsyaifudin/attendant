@@ -83,7 +83,7 @@ func wrapEcho(h Handler) echo.HandlerFunc {
 	}
 }
 
-// stoppingRequest will tell user if server has been stopped but some process still running.
+// stoppingRequest will tell user if Server has been stopped but some process still running.
 // This will be called for graceful shutdown.
 func stoppingRequest(stopped bool) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -103,14 +103,14 @@ func stoppingRequest(stopped bool) echo.MiddlewareFunc {
 				traceID = sc.String()
 			}
 
-			// check if server is shutting down
+			// check if Server is shutting down
 			// if it's the case then don't receive anymore requests
 			if stopped {
 				err := eCtx.JSON(http.StatusLocked, ReplyStructure{
 					Error: &ReplyErrorStructure{
 						Code:    fmt.Sprintf("HTTP_%d", http.StatusLocked),
 						Title:   "Server is shutting down",
-						Message: "server is on command to gracefully shutdown",
+						Message: "Server is on command to gracefully shutdown",
 					},
 					Type: ReplyError,
 					Data: nil,

@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// Config is a configuration needed by server to run
+// Config is a configuration needed by Server to run
 type Config struct {
 	EnableProfiling bool
 	ListenAddress   int
