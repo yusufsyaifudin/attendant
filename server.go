@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	// Import this to make pprof works properly
 	_ "net/http/pprof"
 	"os"
 	"strings"
